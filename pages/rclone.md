@@ -1,0 +1,7 @@
+- [[onedrive]]
+- # Using onedrive with rclone
+- List directories
+	- `rclone lds <remote name>`
+- Make a new directory on remote
+	- `rclone mkdir <remote name>`
+-
