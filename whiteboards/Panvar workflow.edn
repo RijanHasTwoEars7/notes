@@ -1,0 +1,312 @@
+{:blocks (
+{:block/content "```sh\n#!/bin/bash\nwhile getopts i:p:s:n: opt; do\n  case ${opt} in\n    i ) INPUT_FILE=${OPTARG};;\n    p ) PROJECT_NAME=${OPTARG};;\n    s ) SPECIES=${OPTARG};;\n    n ) PHENO=${OPTARG};;\n    \\? ) echo \"Usage: gwas2gene.sh [-i] INPUT_FILE [-p] PROJECT_NAME [-s] SPECIES [-n] Phenotype file\"\n      ;;\n  esac\ndone\n\n\n# This needs to be interactive and not hard-coded\n\nif  [ \"${SPECIES}\" = \"SViridis\" ];\nthen\nSPECIES=\"Setaria\";\nfi\n\nif [ \"${SPECIES}\" = \"Sbicolor\" ] || [ \"${SPECIES}\" = \"Setaria\" ] || [ \"${SPECIES}\" = \"Zmays\" ]; \nthen\necho \"Thank you, G2g is now running on ${SPECIES}!!\"; \nelse\necho \"You did not input the species correctly.\" && exit 0;\nfi\n\nBASE_DIR=\"/shares/baxter/users/rdhakal/panvar/${SPECIES}/\"\nPROGRAM_DIR=\"/shares/baxter/users/rdhakal/panvar/universal_species/\"\nCURRENT_DIR=$PWD\n\n\nwhile read -r SNP_START SNP_LOCATION; do\nbash ${PROGRAM_DIR}/scripts/1.gene_region_finder.sh ${SNP_START} ${SNP_LOCATION} ${PROJECT_NAME} ${SPECIES} &\ndone < ${INPUT_FILE}\nwait\n\nRscript ${PROGRAM_DIR}/scripts/2.gene_region_to_gene_lists_${SPECIES}.R ${PROJECT_NAME} --save\n\n##Clean up outputs\nsed -i 's/\"g' ${CURRENT_DIR}/${PROJECT_NAME}/working/gene_lists_only_by_region/*.region # these region files are made by the rscript above.\n\n\n##launch gene finders\n\n\nfor region_list in  ${CURRENT_DIR}/${PROJECT_NAME}/working/gene_lists_only_by_region/*.region; do\nbash ${PROGRAM_DIR}/scripts/3.gene_diversity_finder_g2g_${SPECIES}.sh $region_list ${PROJECT_NAME} ${SPECIES}&\ndone\nwait\n\nfor file in ${CURRENT_DIR}/${PROJECT_NAME}/results/gene_hits/*/*_impactful_gene_hits.txt; do\nsed -i -e 's/0|0/0/g' -e 's/0|1/1/g' -e 's/1|1/2/g' $file\ndone\n\n##Clean up\n\nmkdir -p ${CURRENT_DIR}/${PROJECT_NAME}/logs\nmv ${CURRENT_DIR}/${PROJECT_NAME}/*log ${CURRENT_DIR}/${PROJECT_NAME}/logs/.\n\n\n##Generate outputs\ncd  ${CURRENT_DIR}/${PROJECT_NAME}/results/gene_hits/\n\n##Remove empty SNP folders before processing\n\nfor file in */*impactful_gene_hits.txt; do\nLINECOUNT=`wc -l ${file} | cut -f1 -d' '`\n\nif [[ $LINECOUNT == 1 ]]; then\n   echo \"${file%%/*} is empty.\"\n        mkdir -p ../no_impactful_hits\n        mv \"${file%%/*}\" ../no_impactful_hits/.\nfi\ndone\n\n##Output script\nln -s ${BASE_DIR}/resources ${CURRENT_DIR}/${PROJECT_NAME}\necho $PHENO\nRscript --vanilla ${PROGRAM_DIR}/scripts/GWAS2Gene_Pheno_Routputs_${SPECIES}_v3.R ${PHENO} ${CURRENT_DIR} ${PROJECT_NAME}\ncd $BASE_DIR\n\necho \"Run complete.\"\n\n\n```"
+:block/format :markdown
+:block/left 
+{:block/uuid #uuid "658b9248-e2ad-4191-a78c-c2a5e07cc83f"}
+:block/parent 
+{:block/uuid #uuid "658b9248-e2ad-4191-a78c-c2a5e07cc83f"}
+:block/properties 
+{}
+:block/uuid #uuid "658b9270-d2fc-4cbc-9852-aea2cc3fe66c"} 
+{:block/created-at 1703721551648
+:block/properties 
+{:ls-type :whiteboard-shape
+:logseq.tldraw.shape 
+{:blockType "B"
+:stroke ""
+:rotation 0
+:collapsed false
+:borderRadius 8
+:index 3
+:scale [1 1]
+:pageId "658b9270-d2fc-4cbc-9852-aea2cc3fe66c"
+:scaleLevel "md"
+:fill ""
+:compact true
+:isAutoResizing true
+:type "logseq-portal"
+:size [1232 2033.53125]
+:strokeType "line"
+:strokeWidth 2
+:opacity 1
+:id "91d1afe0-a463-11ee-96df-55a357945ec6"
+:noFill false
+:point [392 -16]
+:parentId "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:collapsedHeight 0
+:nonce 1703645805515}}
+:block/updated-at 1703721551648} 
+{:block/created-at 1703721551648
+:block/properties 
+{:ls-type :whiteboard-shape
+:logseq.tldraw.shape 
+{:isSizeLocked true
+:stroke ""
+:borderRadius 0
+:index 0
+:scale [1 1]
+:scaleLevel "md"
+:fill ""
+:type "text"
+:size [336 34]
+:fontFamily "var(--ls-font-family)"
+:strokeType "line"
+:strokeWidth 2
+:opacity 1
+:id "a57b41a0-a463-11ee-96df-55a357945ec6"
+:padding 4
+:fontWeight 400
+:noFill true
+:point [416 -120]
+:lineHeight 1.2
+:fontSize 20
+:parentId "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:nonce 1703645838062
+:italic false
+:text "The code starts with `gwas2gene.sh`"}}
+:block/updated-at 1703721551648} 
+{:block/created-at 1703721551648
+:block/properties 
+{:ls-type :whiteboard-shape
+:logseq.tldraw.shape 
+{:stroke ""
+:index 4
+:scale [1 1]
+:scaleLevel "md"
+:fill ""
+:type "line"
+:strokeType "line"
+:strokeWidth 1
+:opacity 1
+:label ""
+:id "b6806752-a463-11ee-96df-55a357945ec6"
+:fontWeight 400
+:noFill true
+:point [606.39 -85]
+:fontSize 20
+:handles 
+{:start 
+{:id "start"
+:canBind true
+:point [0 0]
+:bindingId "b6806750-a463-11ee-96df-55a357945ec6"}
+:end 
+{:id "end"
+:canBind true
+:point [80.86 65]
+:bindingId "b6806751-a463-11ee-96df-55a357945ec6"}}
+:decorations 
+{:end "arrow"}
+:parentId "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:nonce 1703645866672
+:italic false}}
+:block/updated-at 1703721551648} 
+{:block/content "Notes:\n1. It seems that using the notation for chromosomes within the files is the easiest way to wrangle the data."
+:block/format :markdown
+:block/left 
+{:block/uuid #uuid "658b9270-d2fc-4cbc-9852-aea2cc3fe66c"}
+:block/parent 
+{:block/uuid #uuid "658b9248-e2ad-4191-a78c-c2a5e07cc83f"}
+:block/properties 
+{}
+:block/uuid #uuid "658cb63a-5ca3-493d-9d58-a274da37c106"} 
+{:block/created-at 1703721551648
+:block/properties 
+{:ls-type :whiteboard-shape
+:logseq.tldraw.shape 
+{:blockType "B"
+:stroke ""
+:collapsed false
+:borderRadius 8
+:index 1
+:scale [1 1]
+:pageId "658cb63a-5ca3-493d-9d58-a274da37c106"
+:scaleLevel "md"
+:fill ""
+:compact true
+:isAutoResizing true
+:type "logseq-portal"
+:size [400 113.00001027249505]
+:strokeType "line"
+:strokeWidth 2
+:opacity 1
+:id "7c7bcfa0-a511-11ee-9b5d-61651340a334"
+:noFill false
+:point [2256 -8]
+:parentId "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:collapsedHeight 0
+:nonce 1703720501666}}
+:block/updated-at 1703721551648} 
+{:block/created-at 1703721551648
+:block/properties 
+{:ls-type :whiteboard-shape
+:logseq.tldraw.shape 
+{:stroke ""
+:index 5
+:scale [1 1]
+:scaleLevel "md"
+:fill ""
+:type "line"
+:strokeType "line"
+:strokeWidth 1
+:opacity 1
+:label ""
+:id "9cc9c502-a511-11ee-9b5d-61651340a334"
+:fontWeight 400
+:noFill true
+:point [1625 109]
+:fontSize 20
+:handles 
+{:start 
+{:id "start"
+:canBind true
+:point [0 473.63]
+:bindingId "9cc9c500-a511-11ee-9b5d-61651340a334"}
+:end 
+{:id "end"
+:canBind true
+:point [698.88 0]
+:bindingId "9cc9c501-a511-11ee-9b5d-61651340a334"}}
+:decorations 
+{:end "arrow"}
+:parentId "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:nonce 1703720556325
+:italic false}}
+:block/updated-at 1703721551648} 
+{:block/content "What comes after this script?\n\n`Rscript gene_region_to_gene_list.R <project name> --save`"
+:block/format :markdown
+:block/left 
+{:block/uuid #uuid "658cb63a-5ca3-493d-9d58-a274da37c106"}
+:block/parent 
+{:block/uuid #uuid "658b9248-e2ad-4191-a78c-c2a5e07cc83f"}
+:block/properties 
+{}
+:block/uuid #uuid "658cba3f-5039-402f-bfa3-ec45adc36ba7"} 
+{:block/created-at 1703721637248
+:block/properties 
+{:ls-type :whiteboard-shape
+:logseq.tldraw.shape 
+{:blockType "B"
+:stroke ""
+:rotation 0
+:collapsed false
+:borderRadius 8
+:index 2
+:scale [1 1]
+:pageId "658cba3f-5039-402f-bfa3-ec45adc36ba7"
+:scaleLevel "md"
+:fill ""
+:compact true
+:isAutoResizing true
+:type "logseq-portal"
+:size [520 88.99991800757839]
+:strokeType "line"
+:strokeWidth 2
+:opacity 1
+:id "df538b20-a513-11ee-9b5d-61651340a334"
+:noFill false
+:point [568 2288]
+:parentId "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:collapsedHeight 0
+:nonce 1703721526861}}
+:block/updated-at 1703721637248} 
+{:block/created-at 1703721637249
+:block/properties 
+{:ls-type :whiteboard-shape
+:logseq.tldraw.shape 
+{:stroke ""
+:index 6
+:scale [1 1]
+:scaleLevel "md"
+:fill ""
+:type "line"
+:strokeType "line"
+:strokeWidth 1
+:opacity 1
+:label ""
+:id "f157aa40-a513-11ee-9b5d-61651340a334"
+:fontWeight 400
+:noFill true
+:point [789.4 2018.53]
+:fontSize 20
+:handles 
+{:start 
+{:id "start"
+:canBind true
+:point [45.23 0]
+:bindingId "f1578330-a513-11ee-9b5d-61651340a334"}
+:end 
+{:id "end"
+:canBind true
+:point [0 265.47]
+:bindingId "f1578331-a513-11ee-9b5d-61651340a334"}}
+:decorations 
+{:end "arrow"}
+:parentId "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:nonce 1703721556971
+:italic false}}
+:block/updated-at 1703721637249})
+:pages (
+{:block/uuid #uuid "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:block/properties 
+{:ls-type :whiteboard-page
+:logseq.tldraw.page 
+{:id "658b9248-e2ad-4191-a78c-c2a5e07cc83f"
+:name "panvar workflow"
+:bindings 
+{:b6806750-a463-11ee-96df-55a357945ec6 
+{:id "b6806750-a463-11ee-96df-55a357945ec6"
+:type "line"
+:fromId "b6806752-a463-11ee-96df-55a357945ec6"
+:toId "a57b41a0-a463-11ee-96df-55a357945ec6"
+:handleId "start"
+:point [0.5 0.5]
+:distance 4}
+:b6806751-a463-11ee-96df-55a357945ec6 
+{:id "b6806751-a463-11ee-96df-55a357945ec6"
+:type "line"
+:fromId "b6806752-a463-11ee-96df-55a357945ec6"
+:toId "91d1afe0-a463-11ee-96df-55a357945ec6"
+:handleId "end"
+:point [0.61 0.18]
+:distance 4}
+:9cc9c500-a511-11ee-9b5d-61651340a334 
+{:id "9cc9c500-a511-11ee-9b5d-61651340a334"
+:type "line"
+:fromId "9cc9c502-a511-11ee-9b5d-61651340a334"
+:toId "91d1afe0-a463-11ee-96df-55a357945ec6"
+:handleId "start"
+:point [0.5 0.5]
+:distance 4}
+:9cc9c501-a511-11ee-9b5d-61651340a334 
+{:id "9cc9c501-a511-11ee-9b5d-61651340a334"
+:type "line"
+:fromId "9cc9c502-a511-11ee-9b5d-61651340a334"
+:toId "7c7bcfa0-a511-11ee-9b5d-61651340a334"
+:handleId "end"
+:point [0.5 0.26]
+:distance 4}
+:f1578330-a513-11ee-9b5d-61651340a334 
+{:id "f1578330-a513-11ee-9b5d-61651340a334"
+:type "line"
+:fromId "f157aa40-a513-11ee-9b5d-61651340a334"
+:toId "91d1afe0-a463-11ee-96df-55a357945ec6"
+:handleId "start"
+:point [0.5 0.5]
+:distance 4}
+:f1578331-a513-11ee-9b5d-61651340a334 
+{:id "f1578331-a513-11ee-9b5d-61651340a334"
+:type "line"
+:fromId "f157aa40-a513-11ee-9b5d-61651340a334"
+:toId "df538b20-a513-11ee-9b5d-61651340a334"
+:handleId "end"
+:point [0.41 0.54]
+:distance 4}}
+:nonce 1
+:assets []
+:shapes-index ("a57b41a0-a463-11ee-96df-55a357945ec6" "7c7bcfa0-a511-11ee-9b5d-61651340a334" "df538b20-a513-11ee-9b5d-61651340a334" "91d1afe0-a463-11ee-96df-55a357945ec6" "b6806752-a463-11ee-96df-55a357945ec6" "9cc9c502-a511-11ee-9b5d-61651340a334" "f157aa40-a513-11ee-9b5d-61651340a334")}}
+:block/updated-at 1703721637248
+:block/created-at 1703645768747
+:block/type "whiteboard"
+:block/name "panvar workflow"
+:block/original-name "panvar workflow"})}

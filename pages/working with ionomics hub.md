@@ -35,3 +35,7 @@
 - `createdb -h localhost -U rijan_dhakal sample_restore_db`
 - How to enter `psql`
 	- ` sudo su postgres`
+- I currently get into the db using
+	- ` psql -U rijan -d new_soyabean_database_by_rijan`
+- `\dt` is used to list tables
+-

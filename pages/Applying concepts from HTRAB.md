@@ -1,0 +1,9 @@
+- [[Two Detailed reviews of How to read a book]]
+- # Questions from the real world
+- When do I make note of things that I do not understand?
+- # The steps as I apply to them
+- Read the table of contents
+- Read the first two and last two paragraphs of each chapter
+-
+- # Not dones
+- Have not jumped to random parts of the book out of sequence yet
